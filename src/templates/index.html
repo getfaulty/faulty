@@ -1,0 +1,30 @@
+
+{% extends "base.html" %}
+
+{% block content %}
+    {% for project in projects.items %}
+        <div>
+            <a href="{{ url_for('project', project_id=project.public_id) }}">
+                {{ project.public_id }}. {{ project.name }}
+            </a>
+        </div>
+    {% endfor %}
+
+    {% if projects.pages > 1 %}
+    <div class="row">
+        <div class="col-md-12">
+            <div class="text-center">Page
+                <br>
+                {% if projects.page != 1 %}
+                <a href="{{ request.path }}?page={{ projects.prev_num }}">&lt;&lt;&lt;</a>
+                {% endif %}
+
+                {% if projects.next_num %}
+                <a href="{{ request.path }}?page={{ projects.next_num }}">&gt;&gt;&gt;</a>
+                {% endif %}
+            </div>
+        </div>
+    </div>
+{% endif %}
+{% endblock %}
+

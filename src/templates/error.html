@@ -1,0 +1,65 @@
+
+{% extends "base.html" %}
+
+{% block content %}
+    <h1>{{ error.type }}</h1>
+    <h1>{{ error.value }}</h1>
+
+    <p><code>{{ error.date }}</code></p>
+
+    <div x-data="errorDelete">
+        <a href="{{request.path}}?download=true" class="btn btn-primary">Download</a>
+        <button class="btn btn-danger" @click="edit()">Delete</button>
+    </div>
+
+    <hr>
+
+    {% for frame in  error.body["exception"]["values"][0]["stacktrace"]["frames"] | reverse %}
+    <div class="alert alert-secondary">
+        <p class="text-center">{{ frame["abs_path"] }} - line {{ frame["lineno"] }}</p>
+        <pre><code>{{ "\n".join(frame["pre_context"]) }}
+<span class="bg-danger">{{ frame["context_line"] }}</span>
+{{ "\n".join(frame["post_context"]) }}</code></pre>
+        <hr>
+        <div>
+            <small>
+            {% for k, v in frame["vars"].items() %}
+                <span>{{ k }}: {{ v }}</span><br>
+            {% endfor %}
+            </small>
+        </div>
+    </div>
+    {% endfor %}
+
+    <!-- 
+    {{ error.body | pprint | safe }}
+    --> 
+{% endblock %}
+
+{% block scripts %}
+<script>
+    var data = {
+        "error_id": {{ error.id }},
+        "project_id": {{ error.project_id }}
+    };
+    document.addEventListener('alpine:init', () => {
+        Alpine.data('errorDelete', () => ({
+            async edit() {
+                if (confirm("Delete this error?")) {
+                    const resp = await fetch(`/api/errors/${window.data.error_id}`, {
+                        method: 'DELETE',
+                        headers: {
+                            'Accept': 'application/json',
+                            'Content-Type': 'application/json'
+                        },
+                    });
+                    const content = await resp.json();
+                    if (content.success === true) {
+                        window.location.href =  `/projects/${window.data.project_id}`;
+                    }
+                }
+            }
+        }));
+    })
+</script>
+{% endblock %}

@@ -1,0 +1,47 @@
+
+{% extends "base.html" %}
+
+{% block content %}
+    <div x-data="projectName">
+        <h1>{{ project.name }}</h1>
+        <button class="btn btn-primary" @click="edit()">Edit</button>
+    </div>
+
+    <hr>
+
+    {% for error in project.errors %}
+    <div>
+        <a href="{{ url_for('error', error_id=error.id) }}">
+            {{ error.id }}. {{ error.type }} {{ error.value }} - {{ error.date }}
+        </a>
+    </div>
+    {% endfor %}
+{% endblock %}
+
+
+{% block scripts %}
+<script>
+    var data = {
+        "project_id": {{ project.public_id }}
+    };
+    document.addEventListener('alpine:init', () => {
+        Alpine.data('projectName', () => ({
+            async edit() {
+                let name = prompt("New Project Name");
+                const resp = await fetch(`/api/projects/${window.data.project_id}`, {
+                    method: 'PATCH',
+                    headers: {
+                        'Accept': 'application/json',
+                        'Content-Type': 'application/json'
+                    },
+                    body: JSON.stringify({"name": name})
+                });
+                const content = await resp.json();
+                if (content.success === true) {
+                    window.location.reload();
+                }
+            }
+        }));
+    })
+</script>
+{% endblock %}
