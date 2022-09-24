@@ -1,7 +1,6 @@
 # Challenge specific files
 README.md
 WRITEUP.md
-challenge.yml
 
 # Docker files
 Dockerfile
