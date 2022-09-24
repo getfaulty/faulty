@@ -5,5 +5,4 @@ gunicorn 'app:app' \
     --access-logfile "-" \
     --error-logfile "-" \
     --capture-output \
-    --log-level debug \
     --reload
