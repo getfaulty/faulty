@@ -1,7 +1,5 @@
 # faulty
 
-![](https://raw.githubusercontent.com/getfaulty/faulty/main/faulty/static/images/original/hi-res-2-border.png)
-
 A lightweight Sentry clone designed for simple error tracking.
 
 ![](https://raw.githubusercontent.com/getfaulty/faulty/main/faulty/static/images/screenshots/demo.png)
