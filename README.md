@@ -4,6 +4,8 @@
 
 A lightweight Sentry clone designed for simple error tracking.
 
+![](https://raw.githubusercontent.com/getfaulty/faulty/main/faulty/static/images/screenshots/demo.png)
+
 ## Installation
 
 While you can choose to use faulty directly, faulty is intended to work inside of a Docker container.
