@@ -10,13 +10,13 @@ from flask import (
     jsonify,
     send_file,
 )
-from flask_bootstrap import Bootstrap4
+from flask_bootstrap import Bootstrap5
 
 from models import db, Errors, Projects
 
 app = Flask(__name__)
 app.config.from_object("config.Config")
-bootstrap = Bootstrap4(app)
+bootstrap = Bootstrap5(app)
 
 db.init_app(app)
 with app.app_context():
@@ -32,7 +32,8 @@ def index():
 @app.route("/projects/<int:project_id>")
 def project(project_id):
     p = Projects.query.filter_by(public_id=project_id).first_or_404()
-    return render_template("project.html", project=p)
+    dsn = f"{request.scheme}://public@{request.host}/{p.public_id}"
+    return render_template("project.html", project=p, dsn=dsn)
 
 
 @app.route("/errors/<int:error_id>")
@@ -76,9 +77,10 @@ def api_error_delete(error_id):
 
 @app.route("/api/<int:project_id>/store/", methods=["POST"])
 def api_error_ingest(project_id):
-    if request.headers.get("content-encoding") == "gzip":
+    encoding = request.headers.get("Content-Encoding")
+    if encoding == "gzip":
         body = gzip.decompress(request.data)
-    elif request.headers.get("content-encoding") == "deflate":
+    elif encoding == "deflate":
         body = zlib.decompress(request.data)
     else:
         body = request.data

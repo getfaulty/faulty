@@ -1,10 +1,19 @@
 
 {% extends "base.html" %}
 
+{% from 'bootstrap5/utils.html' import render_icon %}
+
 {% block content %}
-    <div x-data="projectName">
+    <div x-data="projectName" class="pt-2">
+        <div class="float-end">
+            <button class="btn btn-primary" @click="edit()" data-bs-toggle="tooltip" data-bs-title="Edit">
+                {{ render_icon('pen') }}
+            </button>
+            <button class="btn btn-secondary" @click="showDSN()" x-data="{ dsn: '{{ dsn }}' }" data-bs-toggle="tooltip" data-bs-title="Show DSN">
+                {{ render_icon('code-slash') }}
+            </button>
+        </div>
         <h1>{{ project.name }}</h1>
-        <button class="btn btn-primary" @click="edit()">Edit</button>
     </div>
 
     <hr>
@@ -26,19 +35,24 @@
     };
     document.addEventListener('alpine:init', () => {
         Alpine.data('projectName', () => ({
+            showDSN() {
+                alert(this.dsn)
+            },
             async edit() {
                 let name = prompt("New Project Name");
-                const resp = await fetch(`/api/projects/${window.data.project_id}`, {
-                    method: 'PATCH',
-                    headers: {
-                        'Accept': 'application/json',
-                        'Content-Type': 'application/json'
-                    },
-                    body: JSON.stringify({"name": name})
-                });
-                const content = await resp.json();
-                if (content.success === true) {
-                    window.location.reload();
+                if (name) {
+                    const resp = await fetch(`/api/projects/${window.data.project_id}`, {
+                        method: 'PATCH',
+                        headers: {
+                            'Accept': 'application/json',
+                            'Content-Type': 'application/json'
+                        },
+                        body: JSON.stringify({"name": name})
+                    });
+                    const content = await resp.json();
+                    if (content.success === true) {
+                        window.location.reload();
+                    }
                 }
             }
         }));

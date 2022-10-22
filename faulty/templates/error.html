@@ -1,30 +1,43 @@
 
 {% extends "base.html" %}
 
+{% from 'bootstrap5/utils.html' import render_icon %}
+
 {% block content %}
-    <h1>{{ error.type }}</h1>
-    <h1>{{ error.value }}</h1>
+    <div class="row pt-2">
+        <div class="col-md-8">
+            <h1 class="font-monospace">{{ error.type }}</h1>
+            <h2 class="font-monospace">{{ error.value }}</h2>
 
-    <p><code>{{ error.date }}</code></p>
+            <p><code>{{ error.date }}</code></p>
+        </div>
 
-    <div x-data="errorDelete">
-        <a href="{{request.path}}?download=true" class="btn btn-primary">Download</a>
-        <button class="btn btn-danger" @click="edit()">Delete</button>
+        <div x-data="errorDelete" class="col-md-4 text-end">
+            <a href="{{request.path}}?download=true" class="btn btn-primary" data-bs-toggle="tooltip" data-bs-title="Download JSON">
+                {{ render_icon('cloud-download') }}
+            </a>
+            <button class="btn btn-danger" @click="deleteError()" data-bs-toggle="tooltip" data-bs-title="Delete">
+                {{ render_icon('trash') }}
+            </button>
+        </div>
     </div>
 
     <hr>
 
     {% for frame in  error.body["exception"]["values"][0]["stacktrace"]["frames"] | reverse %}
-    <div class="alert alert-secondary">
-        <p class="text-center">{{ frame["abs_path"] }} - line {{ frame["lineno"] }}</p>
-        <pre><code>{{ "\n".join(frame["pre_context"]) }}
+    <div class="alert alert-dark">
+        {% set start = frame['lineno'] - (frame['pre_context'] | length) %}
+        {% set lineno = frame['lineno'] %}
+        <p class="text-center font-monospace">{{ frame["abs_path"] }} - line {{ frame["lineno"] }}</p>
+        <pre class="frame d-none" start="{{ start }}" lineno="{{ lineno }}"><code>{{ "\n".join(frame["pre_context"]) }}
 <span class="bg-danger">{{ frame["context_line"] }}</span>
 {{ "\n".join(frame["post_context"]) }}</code></pre>
+        <div class="editor"></div>
         <hr>
         <div>
             <small>
             {% for k, v in frame["vars"].items() %}
-                <span>{{ k }}: {{ v }}</span><br>
+                <span class="font-monospace">{{ k }}: {{ v }}</span><br>
             {% endfor %}
             </small>
         </div>
@@ -42,9 +55,25 @@
         "error_id": {{ error.id }},
         "project_id": {{ error.project_id }}
     };
+
+    let frames = document.querySelectorAll('.frame');
+    frames.forEach((frame) => {
+        let start = parseInt(frame.getAttribute("start"))
+        let lineno = parseInt(frame.getAttribute("lineno"))
+        let editor = CodeMirror(frame.nextSibling.nextSibling, {
+            lineNumbers: true,
+            firstLineNumber: parseInt(frame.getAttribute("start")),
+            value: frame.innerText,
+            readOnly: true,
+            theme: "solarized dark",
+        });
+        let markline = lineno - start - 1
+        editor.markText({line: markline}, {line: markline+1}, {className: "bg-danger bg-opacity-50"});
+    });
+
     document.addEventListener('alpine:init', () => {
         Alpine.data('errorDelete', () => ({
-            async edit() {
+            async deleteError() {
                 if (confirm("Delete this error?")) {
                     const resp = await fetch(`/api/errors/${window.data.error_id}`, {
                         method: 'DELETE',
@@ -60,6 +89,6 @@
                 }
             }
         }));
-    })
+    });
 </script>
 {% endblock %}

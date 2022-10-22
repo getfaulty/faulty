@@ -1,3 +1,15 @@
 main {
     margin-top: 60px;
 }
+
+.font-monospace {
+    font-family: 'Fira Mono', monospace !important;
+}
+
+.CodeMirror {
+    font-family: 'Fira Mono', monospace !important;
+}
+
+.editor {
+    font-family: 'Fira Mono', monospace !important;
+}
