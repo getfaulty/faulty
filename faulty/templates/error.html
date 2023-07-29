@@ -13,6 +13,9 @@
         </div>
 
         <div x-data="errorDelete" class="col-md-4 text-end">
+            <a href="{{request.path}}?raw=true" class="btn btn-secondary" data-bs-toggle="tooltip" data-bs-title="Raw Error JSON">
+                {{ render_icon('code-slash') }}
+            </a>
             <a href="{{request.path}}?download=true" class="btn btn-primary" data-bs-toggle="tooltip" data-bs-title="Download JSON">
                 {{ render_icon('cloud-download') }}
             </a>

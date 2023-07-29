@@ -39,6 +39,8 @@ def project(project_id):
 @app.route("/errors/<int:error_id>")
 def error(error_id):
     e = Errors.query.filter_by(id=error_id).first_or_404()
+    if request.args.get("raw"):
+        return jsonify(e.body)
     if request.args.get("download"):
         buffer = BytesIO()
         buffer.write(json.dumps(e.body).encode("utf-8"))

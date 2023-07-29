@@ -1,4 +1,4 @@
-FROM python:3.7-slim-buster
+FROM python:3.11-slim
 
 WORKDIR /opt/faulty
 RUN mkdir -p /opt/faulty
