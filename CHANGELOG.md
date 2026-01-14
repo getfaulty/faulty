@@ -1,3 +1,7 @@
+# 0.0.4 / 2026-01-14
+
+* Handle SIGTERM properly from Docker container
+
 # 0.0.3 / 2023-07-23
 
 * Add raw output to error view
